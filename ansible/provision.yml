@@ -56,7 +56,7 @@
     args:
       executable: /bin/bash
 
-  - name: Grant acces to docker socket
+  - name: Grant access to docker socket
     shell: sudo chmod 666 /var/run/docker.sock
     args:
       executable: /bin/bash
