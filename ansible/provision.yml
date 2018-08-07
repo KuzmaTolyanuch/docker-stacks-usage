@@ -1,0 +1,51 @@
+#ansible-playbook provision.yml  --syntax-check
+#http://docs.ansible.com/ansible/latest/modules/user_module.html
+#http://docs.ansible.com/ansible/latest/modules/lineinfile_module.html
+#http://docs.ansible.com/ansible/latest/modules/authorized_key_module.html
+
+- hosts:      all
+  tasks:
+  - name:     Add the user ansible
+    user:
+      name:   ansible
+      password: $6$HeBm16RZ$Xf3FcOa.6bCv00S/YUmaA3PSqgy933b.ZACgIhsq..LygVmxfIMENRdOf1ck3dH8ahVDGKQE7WIfIk/QyrqNb0 #Hash for password "ansible"
+      groups:  wheel
+      append: yes
+
+  - name: Set NOPASSWD for wheel group
+    lineinfile:
+      path: /etc/sudoers
+      state: present
+      regexp: '^%wheel\s'
+      line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+  - name: Set authorized key took from file
+    authorized_key:
+      user: ansible
+      state: present
+      key: "{{ lookup('file', '../ansible/keys/id_rsa.pub') }}"
+
+    - name: Add docker repo
+    template:
+      src: /vagrant/ansible/docker.repo
+      dest: /etc/yum.repos.d/docker.repo
+
+  - name: Install docker
+    yum:
+      name: docker-engine
+      state: present
+
+  - name: Start docker
+    service:
+      name: docker
+      state: started
+
+  - name: Enable docker
+    systemd:
+      name: docker
+      enabled: yes
+
+  - name: Admin access for docker user
+    shell: sudo usermod -aG docker $(whoami)
+    args:
+      executable: /bin/bash
