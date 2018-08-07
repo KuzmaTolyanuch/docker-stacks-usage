@@ -24,7 +24,7 @@ Vagrant.configure('2') do |config|
     ansible.playbook = "provisioning/provision.yml"
     ansible.become = true
   end
-  config.vm.synced_folder "c:\\Users\\Valerii_Kuzmenko\\Desktop\\docker-stack-usage\\ansible", "/home/vagrant/ansible", mount_options: ["dmode=775,fmode=600"]
+  config.vm.synced_folder "c:\\Vagrant\\docker-stack-usage\\ansible", "/home/vagrant/ansible", mount_options: ["dmode=775,fmode=600"]
 end
 #https://www.vagrantup.com/docs/provisioning/ansible_intro.html
 # config.vm.define 'k8snode2' do |k8snode2|
