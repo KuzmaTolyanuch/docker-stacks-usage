@@ -19,15 +19,21 @@
       regexp: '^%wheel\s'
       line: '%wheel ALL=(ALL) NOPASSWD: ALL'
 
-  - name: Set authorized key took from file
+  - name: Set authorized key for ansible user
     authorized_key:
       user: ansible
       state: present
       key: "{{ lookup('file', '../ansible/keys/id_rsa.pub') }}"
 
-    - name: Add docker repo
+  - name: Set authorized key for vagrant user
+    authorized_key:
+      user: vagrant
+      state: present
+      key: "{{ lookup('file', '../ansible/keys/id_rsa.pub') }}"
+
+  - name: Add docker repo
     template:
-      src: /vagrant/ansible/docker.repo
+      src: /home/vagrant/ansible/docker.repo
       dest: /etc/yum.repos.d/docker.repo
 
   - name: Install docker
@@ -47,5 +53,10 @@
 
   - name: Admin access for docker user
     shell: sudo usermod -aG docker $(whoami)
+    args:
+      executable: /bin/bash
+
+  - name: Grant acces to docker socket
+    shell: sudo chmod 666 /var/run/docker.sock
     args:
       executable: /bin/bash
